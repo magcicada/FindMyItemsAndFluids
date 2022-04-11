@@ -43,6 +43,12 @@ minecraft {
 repositories {
     mavenCentral()
     maven {
+        url = "https://minecraft.curseforge.com/api/maven"
+    }
+    maven {
+        url = "http://chickenbones.net/maven/"
+    }
+    maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
         url = "http://dvs1.progwml6.com/files/maven"
@@ -54,6 +60,11 @@ dependencies {
     deobfCompile "mezz.jei:jei_1.12.2:${project.jei_version}:api"
     // at runtime, use the full JEI jar
     runtime "mezz.jei:jei_1.12.2:${project.jei_version}"
+    deobfCompile "codechicken-lib-1-8:CodeChickenLib-1.12.2:3.2.3.357:universal"
+    deobfCompile "gregtech-ce-unofficial:gregtech-1.12.2:2.2.1:beta"
+
+
+
 }
 
 processResources {
