@@ -1,33 +1,35 @@
-package com.buuz135.findme.network;
+package com.hjae.findme.network;
 
-import com.buuz135.findme.FindMe;
-import com.buuz135.findme.proxy.FindMeConfig;
+import com.hjae.findme.FindMe;
+import com.hjae.findme.proxy.FindMeConfig;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PositionRequestMessage implements IMessage {
+public class FluidPositionRequestMessage implements IMessage {
 
-    private ItemStack stack;
+    private FluidStack fluid;
 
-    public PositionRequestMessage(ItemStack stack) {
-        this.stack = stack;
+    public FluidPositionRequestMessage(FluidStack fluid) {
+        this.fluid = fluid;
     }
 
-    public PositionRequestMessage() {
+    public FluidPositionRequestMessage() {
     }
 
     public static List<BlockPos> getBlockPosInAABB(AxisAlignedBB axisAlignedBB) {
@@ -45,52 +47,45 @@ public class PositionRequestMessage implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         PacketBuffer packetBuffer = new PacketBuffer(buf);
-        stack = ItemStack.EMPTY;
+        NBTTagCompound fluidStackTag = null;
         try {
-            stack = packetBuffer.readItemStack();
+            fluidStackTag = packetBuffer.readCompoundTag();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (fluidStackTag != null)
+            fluid = FluidStack.loadFluidStackFromNBT(fluidStackTag);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         PacketBuffer packetBuffer = new PacketBuffer(buf);
-        packetBuffer.writeItemStack(stack);
+        NBTTagCompound fluidStackTag = fluid.writeToNBT(new NBTTagCompound());
+        packetBuffer.writeCompoundTag(fluidStackTag);
     }
 
-    public static class Handler implements IMessageHandler<PositionRequestMessage, PositionResponseMessage> {
+    public static class Handler implements IMessageHandler<FluidPositionRequestMessage, PositionResponseMessage> {
 
         @Override
-        public PositionResponseMessage onMessage(PositionRequestMessage message, MessageContext ctx) {
+        public PositionResponseMessage onMessage(FluidPositionRequestMessage message, MessageContext ctx) {
             ctx.getServerHandler().player.world.getMinecraftServer().addScheduledTask(() -> {
                 AxisAlignedBB box = new AxisAlignedBB(ctx.getServerHandler().player.getPosition()).grow(FindMeConfig.RADIUS_RANGE);
                 List<BlockPos> blockPosList = new ArrayList<>();
                 for (BlockPos blockPos : getBlockPosInAABB(box)) {
                     TileEntity tileEntity = ctx.getServerHandler().player.world.getTileEntity(blockPos);
                     if (tileEntity != null) {
-                        if (tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-                            IItemHandler handler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                        if (tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
+                            IFluidHandler handler = tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
                             if (handler != null) {
-                                for (int i = 0; i < handler.getSlots(); i++) {
-                                    if (!handler.getStackInSlot(i).isEmpty() && handler.getStackInSlot(i).isItemEqual(message.stack)) {
-                                        blockPosList.add(blockPos);
-                                        break;
+                                for (IFluidTankProperties property: handler.getTankProperties()) {
+                                    if (property.getContents() != null) {
+                                        if (property.getContents().isFluidEqual(message.fluid)) {
+                                            blockPosList.add(blockPos);
+                                        }
                                     }
                                 }
                             }
                         }
-                        if (tileEntity instanceof IInventory) {
-                            IInventory inventory = (IInventory) tileEntity;
-                            if (inventory.isEmpty()) continue;
-                            for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                                if (!inventory.getStackInSlot(i).isEmpty() && inventory.getStackInSlot(i).isItemEqual(message.stack)) {
-                                    blockPosList.add(blockPos);
-                                    break;
-                                }
-                            }
-                        }
-
                     }
                 }
                 if (!blockPosList.isEmpty())

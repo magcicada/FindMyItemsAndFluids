@@ -1,6 +1,6 @@
-package com.buuz135.findme.proxy;
+package com.hjae.findme.proxy;
 
-import com.buuz135.findme.FindMe;
+import com.hjae.findme.FindMe;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;

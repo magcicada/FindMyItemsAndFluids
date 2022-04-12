@@ -57,11 +57,9 @@ repositories {
 
 dependencies {
 
-    deobfCompile "mezz.jei:jei_1.12.2:${project.jei_version}:api"
-    // at runtime, use the full JEI jar
-    runtime "mezz.jei:jei_1.12.2:${project.jei_version}"
-    deobfCompile "codechicken-lib-1-8:CodeChickenLib-1.12.2:3.2.3.357:universal"
-    deobfCompile "gregtech-ce-unofficial:gregtech-1.12.2:2.2.1:beta"
+    deobfCompile "mezz.jei:jei_1.12.2:${project.jei_version}"
+    deobfCompile "codechicken-lib-1-8:CodeChickenLib-1.12.2:${project.ccl_version}:universal"
+    deobfCompile "gregtech-ce-unofficial:gregtech-1.12.2:${project.gtceu_version}:beta"
 
 
 

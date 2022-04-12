@@ -1,6 +1,6 @@
-package com.buuz135.findme.network;
+package com.hjae.findme.network;
 
-import com.buuz135.findme.proxy.client.ParticlePosition;
+import com.hjae.findme.proxy.client.ParticlePosition;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;

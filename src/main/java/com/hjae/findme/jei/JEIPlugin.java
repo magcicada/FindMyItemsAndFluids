@@ -1,4 +1,4 @@
-package com.buuz135.findme.jei;
+package com.hjae.findme.jei;
 
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;

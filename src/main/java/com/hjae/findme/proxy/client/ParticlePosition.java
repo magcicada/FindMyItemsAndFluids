@@ -1,4 +1,4 @@
-package com.buuz135.findme.proxy.client;
+package com.hjae.findme.proxy.client;
 
 import net.minecraft.client.particle.ParticleCloud;
 import net.minecraft.client.renderer.BufferBuilder;
