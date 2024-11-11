@@ -73,7 +73,7 @@ public class PositionRequestMessage implements IMessage {
                             IItemHandler handler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                             if (handler != null) {
                                 for (int i = 0; i < handler.getSlots(); i++) {
-                                    if (!handler.getStackInSlot(i).isEmpty() && handler.getStackInSlot(i).isItemEqual(message.stack)) {
+                                    if (!handler.getStackInSlot(i).isEmpty() && handler.getStackInSlot(i).isItemEqualIgnoreDurability(message.stack)) {
                                         blockPosList.add(blockPos);
                                         break;
                                     }
@@ -84,7 +84,7 @@ public class PositionRequestMessage implements IMessage {
                             IInventory inventory = (IInventory) tileEntity;
                             if (inventory.isEmpty()) continue;
                             for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                                if (!inventory.getStackInSlot(i).isEmpty() && inventory.getStackInSlot(i).isItemEqual(message.stack)) {
+                                if (!inventory.getStackInSlot(i).isEmpty() && inventory.getStackInSlot(i).isItemEqualIgnoreDurability(message.stack)) {
                                     blockPosList.add(blockPos);
                                     break;
                                 }
